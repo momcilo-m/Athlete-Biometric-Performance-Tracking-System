@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: athlete_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: athlete_performance
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql/createdb.sql:/docker-entrypoint-initdb.d/create_db.sql
+      - postgres_data:/var/lib/postgresql/data
+  
+  rest_service:
+    build: ./fastapi_rest
+    container_name: athlete_rest_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=athlete_performance
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+volumes:
+  postgres_data:
