@@ -29,5 +29,39 @@ services:
       - DB_PASSWORD=password
     depends_on:
       - db
+
+  grpc_service:
+    build: ./node_grcp.0
+    213
+    container_name: athlete_grpc_api
+    restart: always
+    ports:
+      - "50051:50051"
+    environment:
+      - GRPC_PORT=50051
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=athlete_performance
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+
+  graphql_service:
+    build: ./graphql_service
+    container_name: athlete_graphql_api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - GRAPHQL_PORT=4000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=athlete_performance
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+      
 volumes:
   postgres_data:
