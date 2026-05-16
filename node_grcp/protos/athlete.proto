@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package athlete;
+
+service AthleteMetricService {
+    rpc IngestMetric (MetricRequest) returns (MetricResponse);
+    rpc GetSelectiveMetrics (SelectiveRequest) returns (SelectiveResponse);
+}
+
+message MetricRequest {
+  string athlete_id = 1;
+  string recorded_at = 2;
+  float heart_rate = 3;
+  float speed = 4;
+  double acc_x = 5;
+  double acc_y = 6;
+  double acc_z = 7;
+  double gyro_x = 8;
+  double gyro_y = 9;
+  double gyro_z = 10;
+}
+
+message MetricResponse {
+  string status = 1;
+  string message = 2;
+}
+
+message SelectiveRequest {
+  string athlete_id = 1;
+  int32 limit = 2;
+}
+
+message ShortMetric {
+  string athlete_id = 1;
+  string recorded_at = 2;
+  float heart_rate = 3;
+  float speed = 4;
+}
+
+message SelectiveResponse {
+  repeated ShortMetric metrics = 1;
+}
