@@ -1,0 +1,14 @@
+{
+  "name": "athlete-graphql-service",
+  "version": "1.0.0",
+  "description": "GraphQL microservice for selective athlete metrics monitoring",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.3"
+  }
+}   
