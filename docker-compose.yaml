@@ -31,8 +31,7 @@ services:
       - db
 
   grpc_service:
-    build: ./node_grcp.0
-    213
+    build: ./node_grcp
     container_name: athlete_grpc_api
     restart: always
     ports:
@@ -48,7 +47,7 @@ services:
       - db
 
   graphql_service:
-    build: ./graphql_service
+    build: ./node_graphql
     container_name: athlete_graphql_api
     restart: always
     ports:
@@ -62,6 +61,6 @@ services:
       - DB_PASSWORD=password
     depends_on:
       - db
-      
+
 volumes:
   postgres_data:
