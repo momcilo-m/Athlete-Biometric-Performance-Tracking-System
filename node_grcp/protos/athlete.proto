@@ -5,6 +5,7 @@ package athlete;
 service AthleteMetricService {
     rpc IngestMetric (MetricRequest) returns (MetricResponse);
     rpc GetSelectiveMetrics (SelectiveRequest) returns (SelectiveResponse);
+    rpc GetHeavyAggregation (AggregationRequest) returns (AggregationResponse);
 }
 
 message MetricRequest {
@@ -39,4 +40,20 @@ message ShortMetric {
 
 message SelectiveResponse {
   repeated ShortMetric metrics = 1;
+}
+
+message AggregationRequest {
+  string start_time = 1;
+  string end_time = 2;
+}
+
+message AthleteReport {
+  string athlete_id = 1;
+  float avg_heart_rate = 2;
+  float max_speed = 3;
+  int32 total_records = 4;
+}
+
+message AggregationResponse {
+  repeated AthleteReport reports = 1;
 }

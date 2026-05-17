@@ -82,13 +82,51 @@ async function getSelectiveMetrics(call, callback) {
   }
 }
 
+async function getHeavyAggregation(call, callback) {
+  const { start_time, end_time } = call.request;
+
+  // Koristimo isti optimizovani Raw SQL upit sa BRIN indeksom
+  const queryText = `
+    SELECT 
+        athlete_id,
+        ROUND(AVG(heart_rate), 2) as avg_heart_rate,
+        ROUND(MAX(speed), 2) as max_speed,
+        COUNT(*) as total_records
+    FROM athlete_metrics
+    WHERE recorded_at BETWEEN $1 AND $2
+    GROUP BY athlete_id
+    ORDER BY total_records DESC;
+  `;
+
+  try {
+    const res = await db.query(queryText, [start_time, end_time]);
+    
+    // Mapiramo podatke iz baze u format koji Protobuf očekuje (float i int32)
+    const reports = res.rows.map(row => ({
+      athlete_id: row.athlete_id,
+      avg_heart_rate: parseFloat(row.avg_heart_rate) || 0.0,
+      max_speed: parseFloat(row.max_speed) || 0.0,
+      total_records: parseInt(row.total_records, 10) || 0
+    }));
+
+    callback(null, { reports: reports });
+  } catch (err) {
+    console.error("gRPC Heavy Aggregation Error:", err);
+    callback({
+      code: grpc.status.INTERNAL,
+      details: "Database aggregation failed: " + err.message,
+    });
+  }
+}
+
 function main() {
   const server = new grpc.Server();
   
   // Registracija servisa i metoda
   server.addService(athleteProto.AthleteMetricService.service, {
     ingestMetric: ingestMetric,
-    getSelectiveMetrics: getSelectiveMetrics
+    getSelectiveMetrics: getSelectiveMetrics,
+    getHeavyAggregation:getHeavyAggregation
   });
 
   const bindAddress = `0.0.0.0:${config.port}`;
