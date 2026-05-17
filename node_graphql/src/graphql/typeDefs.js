@@ -19,6 +19,7 @@ const typeDefs = `#graphql
   type Query {
     # Scenario B: Selektivno praćenje određenog sportiste uz limit
     getAthleteMetrics(athlete_id: String!, limit: Int): [AthleteMetric]
+    getHeavyAggregation(start_time: String!, end_time: String!): [AthleteAggregationReport]
   }
 
   type Mutation {
@@ -35,6 +36,13 @@ const typeDefs = `#graphql
       gyro_y: Float
       gyro_z: Float
     ): AthleteMetric
+  }
+
+  type AthleteAggregationReport {
+    athlete_id: String!
+    avg_heart_rate: Float
+    max_speed: Float
+    total_records: Int!
   }
 `;
 

@@ -22,6 +22,33 @@ const resolvers = {
         throw new Error("Greška prilikom pretrage podataka.");
       }
     },
+    getHeavyAggregation: async (_, { start_time, end_time }) => {
+      const queryText = `
+        SELECT 
+            athlete_id,
+            ROUND(AVG(heart_rate), 2) as avg_heart_rate,
+            ROUND(MAX(speed), 2) as max_speed,
+            COUNT(*) as total_records
+        FROM athlete_metrics
+        WHERE recorded_at BETWEEN $1 AND $2
+        GROUP BY athlete_id
+        ORDER BY total_records DESC;
+      `;
+      try {
+        const res = await db.query(queryText, [start_time, end_time]);
+        
+        // Vraćamo podatke mapirane prema GraphQL tipu AthleteAggregationReport
+        return res.rows.map(row => ({
+          athlete_id: row.athlete_id,
+          avg_heart_rate: parseFloat(row.avg_heart_rate),
+          max_speed: parseFloat(row.max_speed),
+          total_records: parseInt(row.total_records, 10)
+        }));
+      } catch (err) {
+        console.error("GraphQL Aggregation Error:", err);
+        throw new Error("Greška prilikom izvršavanja istorijske agregacije.");
+      }
+    }
   },
   Mutation: {
     createMetric: async (_, args) => {
